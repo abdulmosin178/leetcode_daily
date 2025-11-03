@@ -13,6 +13,6 @@ class Solution {
                 prev = sorted;
             }
         }
-        return result;
+        return result; //anagram return
     }
 }
