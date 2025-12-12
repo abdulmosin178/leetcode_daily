@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Converter Test</title>
+  <style>
+    body{font-family:Arial;margin:40px}
+    .card{padding:20px;border:1px solid #ddd;border-radius:8px;margin-bottom:20px}
+    button{padding:8px 12px}
+  </style>
+</head>
+<body>
+  <h2>PDF ↔ DOCX Converter (test)</h2>
+
+  <div class="card">
+    <h3>PDF → DOCX</h3>
+    <input type="file" id="pdfToDocxFile" accept="application/pdf"><br><br>
+    <button onclick="upload('/api/convert/pdf-to-docx','pdfToDocxFile')">Convert</button>
+  </div>
+
+  <div class="card">
+    <h3>DOCX → PDF</h3>
+    <input type="file" id="docxToPdfFile" accept=".doc,.docx"><br><br>
+    <button onclick="upload('/api/convert/docx-to-pdf','docxToPdfFile')">Convert</button>
+  </div>
+
+<script>
+function upload(url, inputId) {
+  const f = document.getElementById(inputId).files[0];
+  if (!f) { alert("Choose a file"); return; }
+  const fd = new FormData();
+  fd.append('file', f);
+
+  fetch(url, { method: 'POST', body: fd })
+    .then(resp => {
+      if (!resp.ok) throw new Error('Upload failed: ' + resp.statusText);
+      return resp.blob();
+    })
+    .then(blob => {
+      const a = document.createElement('a');
+      a.href = window.URL.createObjectURL(blob);
+      // derive filename from content-disposition if present
+      const cd = respHeadersToFilename; // fallback handled below
+      let filename = 'converted-file';
+      // Try to get filename from response headers
+      // We can't access headers after blob() in this chain easily; simple fallback used
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    })
+    .catch(err => alert(err));
+}
+</script>
+</body>
+</html>
